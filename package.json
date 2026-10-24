@@ -14,7 +14,7 @@
   },
   "type": "module",
   "bin": {
-    "harnesslock": "./dist/bin.js"
+    "harnesslock": "dist/bin.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

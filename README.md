@@ -370,7 +370,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: GabrielJung0727/harnesslock/integrations/github-action@main
+      - uses: GabrielJung0727/harnesslock/integrations/github-action@v0.1.0
 ```
 
 The [composite action](integrations/github-action/action.yml) runs `harnesslock verify --ci`, uploads SARIF to

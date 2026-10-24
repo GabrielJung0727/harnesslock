@@ -6,6 +6,7 @@ const YAML_FILES = [
   "integrations/github-action/action.yml",
   ".github/workflows/ci.yml",
   ".github/workflows/pages.yml",
+  ".github/workflows/release.yml",
   ".github/dependabot.yml",
 ];
 

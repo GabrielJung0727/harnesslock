@@ -4,7 +4,7 @@ import { CommandSnippet } from "./CopyButton";
 import { GitHubIcon } from "./ui";
 
 const ACTION_YAML = `- uses: actions/checkout@v4
-- uses: GabrielJung0727/harnesslock/integrations/github-action@main`;
+- uses: GabrielJung0727/harnesslock/integrations/github-action@v0.1.0`;
 
 export function GetStarted() {
   return (
