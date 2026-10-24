@@ -7,6 +7,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/harnesslock"><img src="https://img.shields.io/npm/v/harnesslock" alt="npm version"/></a>
+  <a href="https://github.com/GabrielJung0727/harnesslock/actions/workflows/ci.yml"><img src="https://github.com/GabrielJung0727/harnesslock/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue" alt="License: Apache-2.0"/></a>
   <img src="https://img.shields.io/badge/node-%3E%3D20-339933?logo=node.js&logoColor=white" alt="Node.js >= 20"/>
   <img src="https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Cursor-6f42c1" alt="Claude Code, Codex, Cursor"/>
@@ -15,6 +16,7 @@
 </p>
 
 <p align="center">
+  <a href="https://gabrieljung0727.github.io/harnesslock/"><b>Website</b></a> ·
   <a href="#get-started">Get started</a> ·
   <a href="#see-it-in-action">See it in action</a> ·
   <a href="#what-it-checks">What it checks</a> ·
@@ -368,7 +370,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: harnesslock/harnesslock/integrations/github-action@v0.1.0
+      - uses: GabrielJung0727/harnesslock/integrations/github-action@main
 ```
 
 The [composite action](integrations/github-action/action.yml) runs `harnesslock verify --ci`, uploads SARIF to

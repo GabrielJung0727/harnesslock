@@ -3,6 +3,15 @@
   "version": "0.1.0",
   "description": "Vendor-neutral configuration lockfile and drift detector for AI coding agents (Claude Code, OpenAI Codex, Cursor).",
   "license": "Apache-2.0",
+  "author": "GabrielJung0727",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GabrielJung0727/harnesslock.git"
+  },
+  "homepage": "https://gabrieljung0727.github.io/harnesslock/",
+  "bugs": {
+    "url": "https://github.com/GabrielJung0727/harnesslock/issues"
+  },
   "type": "module",
   "bin": {
     "harnesslock": "./dist/bin.js"

@@ -97,7 +97,7 @@ export function toSarif(report: VerificationReport) {
             name: "HarnessLock",
             version: VERSION,
             semanticVersion: VERSION,
-            informationUri: "https://github.com/harnesslock/harnesslock",
+            informationUri: "https://github.com/GabrielJung0727/harnesslock",
             rules: codes.map((code) => ({
               id: code,
               name: code
@@ -107,7 +107,7 @@ export function toSarif(report: VerificationReport) {
                 .join(""),
               shortDescription: { text: RULE_DESCRIPTIONS[code] },
               fullDescription: { text: RULE_DESCRIPTIONS[code] },
-              helpUri: "https://github.com/harnesslock/harnesslock#drift-codes",
+              helpUri: "https://github.com/GabrielJung0727/harnesslock#configuration",
               defaultConfiguration: { level: sarifLevel(report.events.find((e) => e.code === code)?.severity ?? "warning") },
             })),
           },

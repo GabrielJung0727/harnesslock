@@ -7,7 +7,7 @@ branding:
 
 inputs:
   version:
-    description: harnesslock npm version to run (e.g. "0.1.0"). Defaults to the version pinned in the repository, else latest.
+    description: harnesslock npm version to run (e.g. "0.1.0"). Defaults to the project's own harnesslock dev dependency, else the CLI built from this action's commit.
     required: false
     default: ""
   working-directory:
@@ -44,19 +44,23 @@ runs:
       with:
         node-version: "20"
 
-    - name: Resolve harnesslock package
+    # Which harnesslock runs: an explicit npm version, the project's own dev dependency,
+    # or (default) the CLI built from the same commit as this action.
+    - name: Resolve harnesslock
       id: pkg
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
         INPUT_VERSION: ${{ inputs.version }}
+        ACTION_ROOT: ${{ github.action_path }}/../..
       run: |
         if [ -n "$INPUT_VERSION" ]; then
-          echo "spec=harnesslock@$INPUT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "cmd=npx --yes harnesslock@$INPUT_VERSION" >> "$GITHUB_OUTPUT"
         elif [ -f node_modules/harnesslock/package.json ]; then
-          echo "spec=harnesslock@$(node -p "require('./node_modules/harnesslock/package.json').version")" >> "$GITHUB_OUTPUT"
+          echo "cmd=npx --no-install harnesslock" >> "$GITHUB_OUTPUT"
         else
-          echo "spec=harnesslock" >> "$GITHUB_OUTPUT"
+          (cd "$ACTION_ROOT" && npm ci --ignore-scripts --no-audit --no-fund && npm run build)
+          echo "cmd=node $(cd "$ACTION_ROOT" && pwd)/dist/bin.js" >> "$GITHUB_OUTPUT"
         fi
 
     - name: harnesslock verify --ci
@@ -64,16 +68,16 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
-        SPEC: ${{ steps.pkg.outputs.spec }}
+        HL: ${{ steps.pkg.outputs.cmd }}
         SARIF_FILE: ${{ inputs.sarif-file }}
         JOB_SUMMARY: ${{ inputs.job-summary }}
       run: |
         set +e
-        npx --yes "$SPEC" verify --ci --no-color
+        $HL verify --ci --no-color
         code=$?
-        npx --yes "$SPEC" verify --ci --format sarif --output "$SARIF_FILE" --quiet
+        $HL verify --ci --format sarif --output "$SARIF_FILE" --quiet
         if [ "$JOB_SUMMARY" = "true" ]; then
-          npx --yes "$SPEC" verify --ci --format markdown --quiet --output harnesslock-summary.md
+          $HL verify --ci --format markdown --quiet --output harnesslock-summary.md
           cat harnesslock-summary.md >> "$GITHUB_STEP_SUMMARY"
         fi
         echo "exit-code=$code" >> "$GITHUB_OUTPUT"

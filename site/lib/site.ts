@@ -1,8 +1,8 @@
 export const SITE = {
   name: "HarnessLock",
   version: "0.1.0",
-  repo: "https://github.com/harnesslock/harnesslock",
-  docs: "https://github.com/harnesslock/harnesslock#readme",
+  repo: "https://github.com/GabrielJung0727/harnesslock",
+  docs: "https://github.com/GabrielJung0727/harnesslock#readme",
   npm: "https://www.npmjs.com/package/harnesslock",
   install: "npx harnesslock init",
 };

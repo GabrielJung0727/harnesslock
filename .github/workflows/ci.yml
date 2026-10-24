@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cli:
+    name: CLI · ${{ matrix.os }} · Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: ["20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Smoke test the built CLI
+        shell: bash
+        run: |
+          node dist/bin.js --version
+          node dist/bin.js --help > /dev/null
+          node dist/bin.js viz --ci --json > /dev/null
+
+  site:
+    name: Website build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+
+  action:
+    name: GitHub Action (self-test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create a sample agent workspace
+        shell: bash
+        run: |
+          mkdir -p sample/.cursor
+          cd sample
+          printf '# Rules\nUse pnpm.\n' > CLAUDE.md
+          cp CLAUDE.md AGENTS.md
+          echo '{"mcpServers":{"github":{"command":"npx","args":["-y","@modelcontextprotocol/server-github@1.4.7"]}}}' > .cursor/mcp.json
+          cp .cursor/mcp.json .mcp.json
+      - name: init + lock
+        shell: bash
+        working-directory: sample
+        run: |
+          npm ci --prefix .. --ignore-scripts && npm run build --prefix ..
+          node ../dist/bin.js init
+          node ../dist/bin.js lock
+      - uses: ./integrations/github-action
+        with:
+          working-directory: sample
+          sarif: "false"

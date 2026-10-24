@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/harnesslock/harnesslock/schemas/harnesslock.schema.json",
+  "$id": "https://raw.githubusercontent.com/GabrielJung0727/harnesslock/main/schemas/harnesslock.schema.json",
   "title": "harnesslock.yaml",
   "description": "Desired state and policy for AI coding agent configuration (Claude Code, OpenAI Codex, Cursor).",
   "type": "object",
