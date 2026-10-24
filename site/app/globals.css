@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #090b10;
+  --color-panel: #121620;
+  --color-panel-2: #171c28;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-agent: #6366f1;
+  --color-mcp: #10b981;
+  --color-skill: #f59e0b;
+  --color-policy: #ef4444;
+  --color-instruction: #38bdf8;
+  --color-scope: #a855f7;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-ink);
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-ink);
+  color: #e2e8f0;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgb(16 185 129 / 0.35);
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 75%);
+}
+
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.95em;
+  margin-left: 0.08em;
+  vertical-align: -0.08em;
+  background: #10b981;
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .caret::after,
+  .animate-fade-up {
+    animation: none;
+  }
+}
