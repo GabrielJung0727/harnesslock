@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/harnesslock/harnesslock/schemas/harnesslock.schema.json",
+  "title": "harnesslock.yaml",
+  "description": "Desired state and policy for AI coding agent configuration (Claude Code, OpenAI Codex, Cursor).",
+  "type": "object",
+  "required": ["version"],
+  "additionalProperties": false,
+  "$defs": {
+    "policyLevel": { "enum": ["error", "warn", "off"] },
+    "presence": { "enum": ["required", "if_installed", "optional"] },
+    "agentId": { "enum": ["claude-code", "codex", "cursor"] },
+    "stringList": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "agent": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string", "description": "semver version or range the installed agent must satisfy" },
+        "presence": { "$ref": "#/$defs/presence" }
+      }
+    },
+    "mcp": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": {
+            "type": { "enum": ["npm", "uvx", "docker", "local", "http"] },
+            "package": { "type": "string" },
+            "image": { "type": "string" },
+            "url": { "type": "string" }
+          }
+        },
+        "version": { "type": "string", "description": "requested semver version or range" },
+        "require_pinned": { "type": "boolean", "description": "fail when any config launches this server without an exact version" },
+        "required_env": { "$ref": "#/$defs/stringList" },
+        "permissions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "allow": { "$ref": "#/$defs/stringList", "description": "glob patterns (`*` wildcard) of permitted permissions" },
+            "deny": { "$ref": "#/$defs/stringList", "description": "glob patterns that are always rejected" }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "version": { "const": 1 },
+    "agent_strategy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "require_at_least_one": { "type": "boolean", "default": false },
+        "default_presence": { "$ref": "#/$defs/presence", "default": "if_installed" }
+      }
+    },
+    "agents": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/agentId" },
+      "additionalProperties": { "$ref": "#/$defs/agent" }
+    },
+    "instructions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "strategy": { "enum": ["cross-sync", "git-clean", "strict-hash"], "default": "cross-sync" },
+        "sync_groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "files"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "files": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+              "enforce_identical": { "type": "boolean", "default": true }
+            }
+          }
+        },
+        "files": { "$ref": "#/$defs/stringList", "description": "extra instruction files checked by git-clean / strict-hash" }
+      }
+    },
+    "mcp": { "type": "object", "additionalProperties": { "$ref": "#/$defs/mcp" } },
+    "skills": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "required": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "hooks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event"],
+        "properties": {
+          "event": { "type": "string", "minLength": 1 },
+          "agent": { "$ref": "#/$defs/agentId" },
+          "match": { "type": "string", "description": "substring of the hook command (or its matcher) that identifies it" },
+          "required": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "unknown_project_mcp": { "$ref": "#/$defs/policyLevel", "default": "error" },
+        "unpinned_mcp_version": { "$ref": "#/$defs/policyLevel", "default": "error" },
+        "mcp_drift": { "$ref": "#/$defs/policyLevel", "default": "error" },
+        "user_scope_shadowing": { "$ref": "#/$defs/policyLevel", "default": "warn" },
+        "skill_drift": { "$ref": "#/$defs/policyLevel", "default": "error" },
+        "hook_drift": { "$ref": "#/$defs/policyLevel", "default": "error" },
+        "rule_drift": { "$ref": "#/$defs/policyLevel", "default": "warn" },
+        "unexpected_permissions": { "$ref": "#/$defs/policyLevel", "default": "error" },
+        "instruction_drift": { "$ref": "#/$defs/policyLevel", "default": "error" }
+      }
+    },
+    "user_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allow_mcp": { "$ref": "#/$defs/stringList", "description": "user-scope MCP server ids approved for this project" },
+        "allow_hooks": { "type": "boolean", "default": false }
+      }
+    }
+  }
+}

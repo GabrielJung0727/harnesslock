@@ -1,0 +1,96 @@
+name: HarnessLock Verify
+description: Verify AI coding agent configuration (Claude Code, Codex, Cursor) against harnesslock.lock and report drift.
+author: HarnessLock
+branding:
+  icon: lock
+  color: blue
+
+inputs:
+  version:
+    description: harnesslock npm version to run (e.g. "0.1.0"). Defaults to the version pinned in the repository, else latest.
+    required: false
+    default: ""
+  working-directory:
+    description: Directory containing harnesslock.yaml.
+    required: false
+    default: "."
+  sarif:
+    description: Upload a SARIF report to GitHub Code Scanning ("true" / "false"). Requires `security-events: write`.
+    required: false
+    default: "true"
+  sarif-file:
+    description: Path of the SARIF report.
+    required: false
+    default: harnesslock.sarif
+  job-summary:
+    description: Write a markdown report to the job summary ("true" / "false").
+    required: false
+    default: "true"
+  fail-on-drift:
+    description: Fail the job when drift (errors) is detected ("true" / "false").
+    required: false
+    default: "true"
+
+outputs:
+  exit-code:
+    description: "harnesslock verify exit code: 0 clean, 1 drift, 2 invalid configuration."
+    value: ${{ steps.verify.outputs.exit-code }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: Resolve harnesslock package
+      id: pkg
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+      run: |
+        if [ -n "$INPUT_VERSION" ]; then
+          echo "spec=harnesslock@$INPUT_VERSION" >> "$GITHUB_OUTPUT"
+        elif [ -f node_modules/harnesslock/package.json ]; then
+          echo "spec=harnesslock@$(node -p "require('./node_modules/harnesslock/package.json').version")" >> "$GITHUB_OUTPUT"
+        else
+          echo "spec=harnesslock" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: harnesslock verify --ci
+      id: verify
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        SPEC: ${{ steps.pkg.outputs.spec }}
+        SARIF_FILE: ${{ inputs.sarif-file }}
+        JOB_SUMMARY: ${{ inputs.job-summary }}
+      run: |
+        set +e
+        npx --yes "$SPEC" verify --ci --no-color
+        code=$?
+        npx --yes "$SPEC" verify --ci --format sarif --output "$SARIF_FILE" --quiet
+        if [ "$JOB_SUMMARY" = "true" ]; then
+          npx --yes "$SPEC" verify --ci --format markdown --quiet --output harnesslock-summary.md
+          cat harnesslock-summary.md >> "$GITHUB_STEP_SUMMARY"
+        fi
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+        exit 0
+
+    - name: Upload SARIF
+      if: ${{ inputs.sarif == 'true' && always() }}
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.working-directory }}/${{ inputs.sarif-file }}
+        category: harnesslock
+
+    - name: Fail on drift
+      if: ${{ inputs.fail-on-drift == 'true' && steps.verify.outputs.exit-code != '0' }}
+      shell: bash
+      env:
+        CODE: ${{ steps.verify.outputs.exit-code }}
+      run: |
+        echo "::error title=HarnessLock::Agent configuration drift detected (exit code $CODE). Run 'npx harnesslock diff' locally, then 'npx harnesslock sync --pin'."
+        exit "$CODE"

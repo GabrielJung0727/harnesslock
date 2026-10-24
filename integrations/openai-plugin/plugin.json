@@ -1,0 +1,10 @@
+{
+  "name": "harnesslock",
+  "version": "0.1.0",
+  "description": "Read-only drift detection for AI coding agent configuration (AGENTS.md, MCP servers, skills, hooks, permissions) against harnesslock.lock.",
+  "author": { "name": "HarnessLock" },
+  "homepage": "https://github.com/harnesslock/harnesslock",
+  "license": "Apache-2.0",
+  "keywords": ["lockfile", "mcp", "agents", "drift", "codex"],
+  "skills": ["./skills/verify"]
+}
