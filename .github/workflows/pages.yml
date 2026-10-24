@@ -38,7 +38,7 @@ jobs:
           SITE_BASE_PATH: /${{ github.event.repository.name }}
       - name: Disable Jekyll processing
         run: touch out/.nojekyll
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site/out
 
