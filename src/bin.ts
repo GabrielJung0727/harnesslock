@@ -10,6 +10,7 @@ import { runScan } from "./commands/scan.js";
 import { runStatus } from "./commands/status.js";
 import { runSync } from "./commands/sync.js";
 import { runVerify, type OutputFormat } from "./commands/verify.js";
+import { runViz } from "./commands/viz.js";
 import { VERSION } from "./version.js";
 
 const program = new Command();
@@ -101,6 +102,18 @@ program
   .option("--sync-instructions", "copy the canonical instruction file across each sync group")
   .option("--dry-run", "show what would change without writing")
   .action((opts: { pin?: boolean; syncInstructions?: boolean; dryRun?: boolean }) => execute((ctx) => runSync(ctx, opts)));
+
+program
+  .command("viz")
+  .description("render agents, MCP servers, skills, hooks, permissions and drift as an interactive graph (self-contained HTML)")
+  .option("-o, --output <file>", "HTML file to write", "harnesslock-viz.html")
+  .option("--ci", "repository mode: skip machine-specific checks (installed agents, user scope)")
+  .option("--json", "print the graph model as JSON instead of writing HTML")
+  .option("--include-user", "show names of unapproved user-scope MCP servers / hooks")
+  .option("--check-binaries", "allow `<agent> --version` on known agent binaries to detect versions")
+  .action((opts: { output: string; ci?: boolean; json?: boolean; includeUser?: boolean; checkBinaries?: boolean }) =>
+    execute((ctx) => runViz(ctx, opts)),
+  );
 
 program
   .command("status")

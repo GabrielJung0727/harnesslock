@@ -10,7 +10,7 @@ import { detectShadowing } from "../core/shadowing.js";
 import { renderMarkdown } from "../reporter/markdown.js";
 import { renderSarif } from "../reporter/sarif.js";
 import { renderQuietBanner, renderVerifyReport } from "../reporter/tui.js";
-import type { DriftEvent, VerificationReport, WorkspaceScan } from "../types/model.js";
+import type { AgentDetection, DriftEvent, ShadowingReport, VerificationReport, WorkspaceScan } from "../types/model.js";
 import { VERSION } from "../version.js";
 import { loadProject, type CommandContext, type Project } from "./context.js";
 
@@ -29,6 +29,10 @@ export interface VerifyRun {
   report: VerificationReport;
   project: Project;
   scan: WorkspaceScan;
+  /** Local mode only. */
+  agents?: AgentDetection[];
+  /** Local mode only. */
+  shadowing?: ShadowingReport;
 }
 
 function lineOf(text: string, needles: string[]): number | undefined {
@@ -91,7 +95,7 @@ export async function verifyWorkspace(ctx: CommandContext, options: VerifyOption
     durationMs: Math.max(1, Math.round(performance.now() - started)),
     exitCode: exitCodeFor(events),
   };
-  return { report, project, scan };
+  return { report, project, scan, agents, shadowing };
 }
 
 export function formatReport(report: VerificationReport, format: OutputFormat, color: boolean): string {

@@ -68,6 +68,9 @@ export { runSync, syncWorkspace, type SyncOptions } from "./commands/sync.js";
 export { runStatus } from "./commands/status.js";
 export { runDoctor } from "./commands/doctor.js";
 export { installGitHooks, runInstallHooks } from "./commands/hooks.js";
+export { buildWorkspaceViz, runViz, type VizOptions } from "./commands/viz.js";
+export { buildVizGraph, type VizGraph, type VizLink, type VizNode } from "./core/viz-model.js";
+export { renderVizHtml } from "./reporter/viz-html.js";
 
 export { renderVerifyReport, renderQuietBanner } from "./reporter/tui.js";
 export { renderSarif, toSarif } from "./reporter/sarif.js";

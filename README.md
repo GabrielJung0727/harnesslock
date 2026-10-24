@@ -165,6 +165,7 @@ and only its **count** and **source path** are shown. Its name appears only with
 | **Agent presence** | `required` / `if_installed` / `optional` per agent, with semver ranges checked against static package metadata |
 | **Remediation** | `sync` rewrites JSON while keeping its indentation and line endings, and edits Codex TOML in place, keeping comments |
 | **Reports** | Terminal, JSON, SARIF 2.1.0 (GitHub Code Scanning) and markdown (PR comments / job summaries) |
+| **Visualizer** | `harnesslock viz` writes one self-contained, offline HTML file: an interactive graph of every agent, MCP server, skill, hook, rule and permission, with drift pulsing red and a clickable findings list |
 
 ### Supported agents
 
@@ -212,6 +213,9 @@ npx harnesslock diff                      # expected vs actual + line diffs of d
 npx harnesslock sync                      # re-pin mismatched versions, drop unauthorized permissions
 npx harnesslock sync --pin                # ...and pin unpinned servers + sync instruction files
 npx harnesslock sync --pin --dry-run      # preview without writing
+
+npx harnesslock viz                       # interactive graph of agents, MCPs, skills, permissions & drift
+npx harnesslock viz --ci -o graph.html    # repository view, e.g. as a CI artifact
 
 npx harnesslock status                    # one-screen overview
 npx harnesslock doctor                    # runtime, config validity, git hooks, agents, caches
