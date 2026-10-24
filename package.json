@@ -50,7 +50,8 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+    "prepublishOnly": "npm run typecheck && npm test && npm run build",
+    "version": "node scripts/sync-version.mjs && git add integrations/openai-plugin/plugin.json site/lib/site.ts"
   },
   "dependencies": {
     "commander": "^14.0.3",

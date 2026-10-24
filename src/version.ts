@@ -1,2 +1,4 @@
-/** Kept in sync with package.json `version`. */
-export const VERSION = "0.1.0";
+import { version } from "../package.json";
+
+/** Read from package.json at build time, so `npm version` is the single source of truth. */
+export const VERSION: string = version;

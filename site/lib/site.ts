@@ -1,6 +1,6 @@
 export const SITE = {
   name: "HarnessLock",
-  version: "0.1.0",
+  version: "0.1.1",
   repo: "https://github.com/GabrielJung0727/harnesslock",
   docs: "https://github.com/GabrielJung0727/harnesslock#readme",
   npm: "https://www.npmjs.com/package/harnesslock",

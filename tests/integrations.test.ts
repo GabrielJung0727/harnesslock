@@ -29,3 +29,13 @@ describe("shipped integration files", () => {
     expect(manifest.skills).toEqual(["./skills/verify"]);
   });
 });
+
+describe("version consistency", () => {
+  it("CLI, plugin manifest and website report the package.json version", async () => {
+    const { version } = JSON.parse(await fs.readFile("package.json", "utf8"));
+    const { VERSION } = await import("../src/version.js");
+    expect(VERSION).toBe(version);
+    expect(JSON.parse(await fs.readFile("integrations/openai-plugin/plugin.json", "utf8")).version).toBe(version);
+    expect(await fs.readFile("site/lib/site.ts", "utf8")).toContain(`version: "${version}"`);
+  });
+});
