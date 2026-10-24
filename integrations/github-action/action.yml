@@ -15,7 +15,7 @@ inputs:
     required: false
     default: "."
   sarif:
-    description: Upload a SARIF report to GitHub Code Scanning ("true" / "false"). Requires `security-events: write`.
+    description: 'Upload a SARIF report to GitHub Code Scanning ("true" / "false"). Requires `security-events: write`.'
     required: false
     default: "true"
   sarif-file:
